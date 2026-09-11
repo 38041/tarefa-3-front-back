@@ -8,7 +8,7 @@
 //   Regra de ouro deste arquivo:
 //   ─────────────────────────────
 //   Este é o ÚNICO lugar do projeto que sabe o endereço da API e sabe
-//   escrever `fetch`. Os componentes só chamam funções daqui.
+//   escrever fetch. Os componentes só chamam funções daqui.
 //   Isso se chama "camada de serviço" e é o padrão usado no mercado —
 //   se amanhã a API mudar de endereço, você mexe em 1 arquivo, não em 12.
 //
@@ -47,9 +47,9 @@ import { API_URL } from "../config";
 // ╚═════════════════════════════════════════════════════════════════════╝
 export async function login(email, senha) {
   // 1) DISPARA o pedido e ESPERA a resposta chegar.
-  //    `await` = "segura aqui até voltar". Sem ele você recebe uma
+  //    await = "segura aqui até voltar". Sem ele você recebe uma
   //    Promise (uma promessa), não os dados.
-  const resposta = await fetch(`${API_URL}/api/usuarios/login`, {
+  const resposta = await fetch(${API_URL}/api/usuarios/login, {
     // 2) O MÉTODO diz a INTENÇÃO do pedido:
     //    GET = ler | POST = criar | PUT = atualizar | DELETE = apagar
     method: "POST",
@@ -66,12 +66,12 @@ export async function login(email, senha) {
   });
 
   // 5) A resposta chegou como texto. Traduzimos de volta para objeto JS.
-  //    Repare no segundo `await`: ler o corpo também é assíncrono.
+  //    Repare no segundo await: ler o corpo também é assíncrono.
   const dados = await resposta.json();
 
   // 6) ⚠️ ARMADILHA CLÁSSICA: o fetch NÃO dá erro quando o status é 401 ou
   //    404. Para o fetch, "recebi uma resposta" já é sucesso.
-  //    Quem avisa se deu certo é `resposta.ok` (true de 200 a 299).
+  //    Quem avisa se deu certo é resposta.ok (true de 200 a 299).
   //    Se você esquecer este if, um login errado passa como se tivesse dado
   //    certo — e o app quebra 3 telas depois, sem você entender por quê.
   if (!resposta.ok) {
@@ -92,7 +92,7 @@ export async function login(email, senha) {
 // ╚═════════════════════════════════════════════════════════════════════╝
 //
 //  RECEITA:
-//    1. fetch para `${API_URL}/api/usuarios/cadastrar`
+//    1. fetch para ${API_URL}/api/usuarios/cadastrar
 //    2. method: "POST"
 //    3. headers com "Content-Type": "application/json"
 //    4. body: JSON.stringify({ nome, email, senha })
@@ -100,7 +100,7 @@ export async function login(email, senha) {
 //    6. se !resposta.ok → throw new Error(dados.mensagem)
 //    7. return dados
 //
-//  💡 É quase idêntico ao `login` acima. A diferença: a URL e três campos
+//  💡 É quase idêntico ao login acima. A diferença: a URL e três campos
 //     no body em vez de dois.
 //
 //  ✅ Deu certo quando: você cria uma conta e cai direto no painel logado.
@@ -109,9 +109,21 @@ export async function login(email, senha) {
 //     Sua mensagem tem que aparecer em vermelho na tela.
 //
 export async function cadastrar(nome, email, senha) {
-  // ↓↓↓ APAGUE ESTA LINHA E ESCREVA SEU CÓDIGO ↓↓↓
-  throw new Error("🚧 TAREFA 1 ainda não foi implementada (src/services/api.js)");
+  const resposta = await fetch(${API_URL}/api/usuarios/cadastrar, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome, email, senha }),
+  });
+
+  const dados = await resposta.json();
+
+  if (!resposta.ok) {
+    throw new Error(dados.mensagem || "Não foi possível criar a conta.");
+  }
+
+  return dados; // { sucesso, mensagem, token, usuario }
 }
+
 
 // ╔═════════════════════════════════════════════════════════════════════╗
 // ║                                                                     ║
@@ -124,21 +136,21 @@ export async function cadastrar(nome, email, senha) {
 //
 //  ⚠️ ESTA É A PRIMEIRA ROTA PRIVADA. Aqui entra o CRACHÁ.
 //
-//  Toda vez que você faz login, o backend te devolve um `token` — uma
+//  Toda vez que você faz login, o backend te devolve um token — uma
 //  string gigante que prova quem você é. Rota privada sem token = 401.
-//  O token vai num header chamado `Authorization`, e o valor precisa
+//  O token vai num header chamado Authorization, e o valor precisa
 //  começar com a palavra "Bearer" + um espaço:
 //
-//      headers: { Authorization: `Bearer ${token}` }
+//      headers: { Authorization: Bearer ${token} }
 //
 //  (Se esquecer o "Bearer " o backend também devolve 401. É o erro nº 1
 //   da turma. Olhe o painel preto embaixo: ele mostra o header que saiu.)
 //
 //  RECEITA:
-//    1. fetch para `${API_URL}/api/usuarios`
+//    1. fetch para ${API_URL}/api/usuarios
 //    2. NÃO precisa de method (GET é o padrão do fetch)
 //    3. NÃO precisa de body — GET não carrega body, nunca
-//    4. headers: { Authorization: `Bearer ${token}` }
+//    4. headers: { Authorization: Bearer ${token} }
 //    5. .json(), checar resposta.ok, throw se der ruim
 //    6. return dados.usuarios   ← devolva SÓ O ARRAY, não o objeto inteiro
 //
@@ -146,8 +158,17 @@ export async function cadastrar(nome, email, senha) {
 //  🧪 Teste o erro: apague uma letra do token antes de mandar e veja o 401.
 //
 export async function listarUsuarios(token) {
-  // ↓↓↓ APAGUE ESTA LINHA E ESCREVA SEU CÓDIGO ↓↓↓
-  throw new Error("🚧 TAREFA 2 ainda não foi implementada (src/services/api.js)");
+  const resposta = await fetch(${API_URL}/api/usuarios, {
+    headers: { Authorization: Bearer ${token} },
+  });
+
+  const dados = await resposta.json();
+
+  if (!resposta.ok) {
+    throw new Error(dados.mensagem || "Não foi possível carregar a lista.");
+  }
+
+  return dados.usuarios;
 }
 
 // ╔═════════════════════════════════════════════════════════════════════╗
@@ -165,11 +186,11 @@ export async function listarUsuarios(token) {
 //
 //        headers: {
 //          "Content-Type": "application/json",
-//          Authorization: `Bearer ${token}`,
+//          Authorization: Bearer ${token},
 //        }
 //
 //  RECEITA:
-//    1. fetch para `${API_URL}/api/usuarios/editar`
+//    1. fetch para ${API_URL}/api/usuarios/editar
 //    2. method: "PUT"
 //    3. os dois headers acima
 //    4. body: JSON.stringify({ nome, email })
@@ -182,23 +203,21 @@ export async function listarUsuarios(token) {
 //     no formulário? (Resposta: o componente pai recarregou a lista.)
 //
 export async function editarPerfil(token, nome, email) {
-  const resposta = await fetch(`${trabalho-mongodb.vercel.app}/api/usuarios/editar`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    }, 
-    body: JSON.stringify({ nome, email }),
-  });
-
-  const dados = await resposta.json();
-
-  if (!resposta.ok) {
-    throw new Error(dados.mensagem || "Não foi possível editar o perfil.");
-  }
-
-  return dados;
+  const resposta = await fetch(${API_URL}/api/usuarios/editar, {
+  method: "PUT",
+  headers: {
+"Content-Type": "application/json",
+Authorization: Bearer ${token},
+},
+body: JSON.stringify({ nome, email }),
+});
+const dados = await resposta.json();
+if (!resposta.ok) {
+throw new Error(dados.mensagem || "Não foi possível salvar.");
 }
+ return dados;
+}
+
 // ╔═════════════════════════════════════════════════════════════════════╗
 // ║                                                                     ║
 // ║   🚧  TAREFA 4 — EXCLUSÃO  (DELETE)                                 ║
@@ -211,9 +230,9 @@ export async function editarPerfil(token, nome, email) {
 //  É a mais curta das quatro: sem body, só o crachá.
 //
 //  RECEITA:
-//    1. fetch para `${API_URL}/api/usuarios/desativar`
+//    1. fetch para ${API_URL}/api/usuarios/desativar
 //    2. method: "DELETE"
-//    3. headers: { Authorization: `Bearer ${token}` }
+//    3. headers: { Authorization: Bearer ${token} }
 //    4. .json(), checar resposta.ok, throw se der ruim
 //    5. return dados
 //
@@ -221,12 +240,19 @@ export async function editarPerfil(token, nome, email) {
 //
 //  🧠 CURIOSIDADE IMPORTANTE — "soft delete":
 //     Olhe o backend: o DELETE não apaga nada de verdade! Ele só marca
-//     `ativo: false` no banco. O registro continua lá.
+//     ativo: false no banco. O registro continua lá.
 //     Empresas fazem isso o tempo todo: dá pra recuperar conta, manter
 //     histórico e obedecer a lei. Quando você "exclui" sua conta numa rede
 //     social, quase sempre é isso que acontece.
 //
-export async function desativarConta(token) {
-  // ↓↓↓ APAGUE ESTA LINHA E ESCREVA SEU CÓDIGO ↓↓↓
-  throw new Error("🚧 TAREFA 4 ainda não foi implementada (src/services/api.js)");
+  export async function desativarConta(token) {
+  const resposta = await fetch(${API_URL}/api/usuarios/desativar, {
+  method: "DELETE",
+headers: { Authorization: Bearer ${token} },
+});
+const dados = await resposta.json();
+if (!resposta.ok) {
+throw new Error(dados.mensagem || "Não foi possível desativar a conta.");
+}
+return dados;
 }
