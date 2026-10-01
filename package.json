@@ -1,19 +1,18 @@
 {
-  "name": "front-3c",
-  "private": true,
+  "name": "tcc-auth-system",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Sistema de login, cadastro e exclusão de usuário com banco de dados",
+  "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "bcryptjs": "^2.4.0",
+    "body-parser": "^1.20.0",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.0",
+    "express-session": "^1.9.0",
+    "mysql2": "^3.24.4"
   }
 }
